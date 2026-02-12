@@ -39,6 +39,7 @@ Shader "Custom/SimpleLambert_URP" // Single light (1 pass)
                 float4 positionClipSpace : SV_POSITION;
                 float3 normalWorldSpace : TEXCOORD0;
                 float2 uv : TEXCOORD1;
+              
             };
 
             v2f vert(appData input)
@@ -71,15 +72,13 @@ Shader "Custom/SimpleLambert_URP" // Single light (1 pass)
                 float normal_dot_light = max(0, dot(normal, lightDir)); // now we have a value 0 to 1 that represents how lined up the normal is with the direction to the light 
                 // when the normal is 1 the light is shining directly at the normal 
 
+                
+            
+
                 float4 tex = SAMPLE_TEXTURE2D(_MainTex, sampler_MainTex, input.uv);
 
-               
 
                 float3 diffuse = tex.rgb * mainLight.color * normal_dot_light; // TODO: @me illustrate this on photoshop 
-                
-                
-                
-
 
                 return float4(diffuse, tex.a);
             }
@@ -88,14 +87,18 @@ Shader "Custom/SimpleLambert_URP" // Single light (1 pass)
 
             // MINI CHALLENGES 
             
-            // CHALLENGE I 
+            // CHALLENGE I - BASIC TOON
             // Toon shading is pretty cool. How do you think it works? Can you figure out how to add toon banding? 
             // HINTS: 1) create a value for how many bands you have i.e     float bands = 4.0
             // HINTS: 2) maybe you can use the round or floor function? 
             // Super extra bonus: usually toon shading is not fully black even when no light hits the surface. How could you add a 'lift'? 
 
-            //
+            // CHALLENGE II
+            // Different Shadow Color 
+            // Can you create a color that represents a shadow color, and then blend between the texture color and the shadow color? You may choose a dark red or dark blue color for a nice effect
+            // HINTS: 1) can you lerp it? 
 
+            // CHALLENGE III brainstorm together: How could we add rim lighting? Which vectors would we need 
 
         }
     }
