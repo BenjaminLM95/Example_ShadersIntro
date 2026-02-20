@@ -83,6 +83,8 @@ Shader "Custom/SimpleLambert_URP" // Single light (1 pass)
                 return float4(diffuse, tex.a);
             }
 
+
+
             ENDHLSL
 
             // MINI CHALLENGES 
@@ -100,6 +102,44 @@ Shader "Custom/SimpleLambert_URP" // Single light (1 pass)
 
             // CHALLENGE III brainstorm together: How could we add rim lighting? Which vectors would we need 
 
+            half4 frag(v2f input) : SV_Target
+{
+     // normalize our normal vector. It is probably already normalized but no guarantee
+     // some things could affect it such as scaling. 
+     // PS: we need it normalized because normalized vectors give dot products between -1 and 1, which is sensical to work with.
+     float3 normal = normalize(input.normalWorldSpace);
+ 
+     // Light struct/ methods come from the Lighting.hlsl include above 
+     Light mainLight = GetMainLight();
+     float3 lightDir = normalize(mainLight.direction); // again we want two normalized vectors. This is the direction to the light
+     // images.squarespace-cdn.com/content/v1/54851541e4b0fb60932ad015/1483897078629-QJOZ703T119UAEEEEOEU/image-asset.jpeg
+ 
+     // take max of 0 and normal. Normal could be -1 but that means the light is coming from backside of face, which we want to be effectively the same as 0
+     float normal_dot_light = max(0, dot(normal, lightDir)); // now we have a value 0 to 1 that represents how lined up the normal is with the direction to the light 
+     // when the normal is 1 the light is shining directly at the normal
+ 
+ 
+     float lift = 0.1;
+
+ 
+     float bands = 4.0;
+     float quantized = floor(normal_dot_light * bands) / bands;
+ 
+     quantized = lerp(lift, 1, quantized);
+ 
+     float4 tex = SAMPLE_TEXTURE2D(_MainTex, sampler_MainTex, input.uv);
+ 
+     
+ 
+     float3 diffuse = tex.rgb * mainLight.color * quantized; // TODO: @me illustrate this on photoshop
+ 
+     return float4(diffuse, tex.a);
+}
+
         }
     }
+
+
 }
+
+
